@@ -3,7 +3,7 @@
 #include <iostream>
 #include <process.h>
 #include <list>
-#include "Eventsmain.h"
+#include "Events.h"
 using namespace std;
 class EasySocket
 {
@@ -11,10 +11,11 @@ private:
 	SOCKET conection;
 	sockaddr_in InformacoesConection;
 	list<string> Entradas;
+	Events Eventos;
 public:
 	static int bffSiz;
 	static void ReceiverDefault(void *arg);
-	EasySocket(std::string ip, int porta,void(*funcao)());
+	EasySocket(std::string ip, int porta,void(*funcao)(void *arg));
 	string getEntrada();
 	int qtEntradas();
 	void conectar();

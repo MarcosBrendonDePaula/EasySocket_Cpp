@@ -1,6 +1,6 @@
 #include "nsock.h"
 Events nsock::evs;
-void* nsock::ReceiveFunction(void *arg)
+void nsock::ReceiveFunction(void *arg)
 {
 	nsock* This=(nsock*)arg;
 	char buffer[2048];
@@ -8,17 +8,23 @@ void* nsock::ReceiveFunction(void *arg)
 	while(recv(This->cliente,buffer,sizeof(buffer),0)>0){
 		string entrada(buffer);
 		This->Entrada.push_back(entrada);
-		This->ordem->push_back(This->id);
+		/*if(!This->evs.getEvent(1)->funcao)
+			This->ordem->push_back(This->id);*/
 		nsock::evs.getEvent(1)->parametros=This;
 		nsock::evs.sendSignal(1);
 		memset(buffer,0x0,sizeof(buffer));
 	}
-	for(vector<nsock*>::iterator it=This->conexoes->begin();it!=This->conexoes->end();it++)
-		if((*it)->id==This->id){
-			This->conexoes->erase(it);
+	int posicao=-1;
+	for(vector<nsock*>::iterator it=This->conexoes->begin();it!=This->conexoes->end();it++){
+		posicao++;
+		if(!(*it)->id-This->id){
+			free((*it));
+			break;
 		}
-	pthread_exit(NULL);
-	return NULL;
+	}
+	This->Entrada.clear();
+	This->conexoes->erase(This->conexoes->begin()+posicao);
+	return;
 }
 
 nsock::nsock(list<int> *lista,vector<nsock*> *cn)
@@ -37,7 +43,7 @@ struct sockaddr_in* nsock::getDadosCliente()
 }
 void nsock::start()
 {
-	pthread_create(&this->Process,NULL,nsock::ReceiveFunction,this);
+	_beginthread(nsock::ReceiveFunction,0,this);
 }
 string nsock::getEntrada()
 {

@@ -8,7 +8,7 @@ Events::Events(){
     //this->Debug=Debug;
     this->rodando=0;
     Events::static_Acess=this;
-    pthread_create(&this->executor,0,Events::ExecutorF,this);
+    _beginthread(Events::ExecutorF,0,this);
 
 }
 
@@ -25,7 +25,7 @@ void Events::sendSignal(int ID){
     
 }
 
-void* Events::ExecutorF(void* arg){
+void Events::ExecutorF(void* arg){
     Events *This=(Events*)arg;
     	while(true){
 		lim:
@@ -52,4 +52,9 @@ Event::Event(int ID,void(*funcao)(void*),void *parametro){
     this->funcao=funcao;
     this->ID=ID;
     this->parametros=parametro;
+}
+Event::Event(int ID,void(*funcao)(void*)){
+    this->funcao=funcao;
+    this->ID=ID;
+    this->parametros=NULL;
 }

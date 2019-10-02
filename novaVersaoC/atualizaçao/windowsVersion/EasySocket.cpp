@@ -3,8 +3,8 @@
 #include <cstring>
 #include <process.h>
 
-EasySocket::EasySocket(std::string ip, int porta,void(*funcao)()){
-	EventsMain::Eventosmain.addEvent(new Evento(3,funcao));
+EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg)){
+	Events::static_Acess->addEvent(new Event(3,funcao,NULL));
 	memset(&this->InformacoesConection, 0x0, sizeof(this->InformacoesConection));
 	this->InformacoesConection.sin_port = htons(porta);
 	this->InformacoesConection.sin_addr.s_addr = inet_addr(ip.c_str());
@@ -34,7 +34,7 @@ void EasySocket::ReceiverDefault(void *arg){
 		string nm(buffer);
 		sk->Entradas.push_back(nm);
 		memset(buffer, 0x0, sizeof(buffer));
-		EventsMain::Eventosmain.EnviarSinal(3);
+		Events::static_Acess->sendSignal(3);
 	}
 	std::cout << "Desconectado" << std::endl;
 	closesocket(sk->conection);

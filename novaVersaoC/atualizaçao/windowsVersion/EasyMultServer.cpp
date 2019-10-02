@@ -2,7 +2,7 @@
 //static membros
 list<int> EasyMultServer::OrdemDeChegada;
 
-void* EasyMultServer::Recebimento(void *arg){
+void EasyMultServer::Recebimento(void *arg){
 		EasyMultServer* This=(EasyMultServer*)arg;
 		This->id=1;
 		while(true){
@@ -54,5 +54,6 @@ void EasyMultServer::StartServer(void(*Processamento)(void*)){
 	if (listen(this->ServeSock, 500) == SOCKET_ERROR){
 		cout << "falha ao ficar na escuta" << endl;
 	}
-	pthread_create(&this->Process,NULL,EasyMultServer::Recebimento,this);
+	_beginthread(EasyMultServer::Recebimento,0,this);
+	//pthread_create(&this->Process,NULL,EasyMultServer::Recebimento,this);
 }
