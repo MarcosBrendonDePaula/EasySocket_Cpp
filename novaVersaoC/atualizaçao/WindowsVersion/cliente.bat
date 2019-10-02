@@ -1,1 +1,0 @@
-g++ EasySocket.cpp Events.cpp cliente.cpp -o cliente -l ws2_32
