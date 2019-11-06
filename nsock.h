@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
+#include <stdexcept>
 #include <cstring>
 #include "Events.h"
 
@@ -14,7 +15,7 @@ class nsock{
 		list<string> Entrada;
 		list<int> *ordem;
 		vector<nsock*> *conexoes;
-		//void(*ProcessFunction)(void*);
+		int erro;
 	public:
 		int id;
 		static Events evs;

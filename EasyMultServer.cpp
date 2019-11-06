@@ -26,14 +26,14 @@ void EasyMultServer::Recebimento(void *arg){
 
 nsock* EasyMultServer::getConID(int i)
 {
-		vector<nsock*>::iterator it;
-		for(it=this->Conexoes.begin();it!=this->Conexoes.end();it++){
-			nsock *c=*it;
-			if(c->id==i){
-				return *it;
-			}
+	vector<nsock*>::iterator it;
+	for(it=this->Conexoes.begin();it!=this->Conexoes.end();it++){
+		nsock *c=*it;
+		if(c->id==i){
+			return *it;
 		}
-		return NULL;
+	}
+	throw std::runtime_error("Nao localizado");
 }
 
 EasyMultServer::EasyMultServer(int porta){
@@ -45,8 +45,15 @@ EasyMultServer::EasyMultServer(int porta){
     this->DadosSocket.sin_addr.s_addr = htonl(INADDR_ANY);
 	
 }
+
+void EasyMultServer::removeNode(void* entrada){
+	int *i=(int*)entrada;
+	cout<<"Ponto para Remover"<<*i<<endl;
+}
+
 void EasyMultServer::StartServer(void(*Processamento)(void*)){
 	Events::static_Acess->addEvent(new Event(1,Processamento,NULL));
+	Events::static_Acess->addEvent(new Event(2,&EasyMultServer::removeNode,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) == SOCKET_ERROR){
 		closesocket(this->ServeSock);
 		cout << "Erro ao associar a porta" << endl;

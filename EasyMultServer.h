@@ -16,6 +16,7 @@ class EasyMultServer{
 		vector<nsock*> Conexoes;
 		static list<int> OrdemDeChegada;
 		static void Recebimento(void *arg);
+		static void removeNode(void* entrada);
 		EasyMultServer(int porta);
 		void StartServer(void(*Processamento)(void*));
 		nsock* getConID(int i);
