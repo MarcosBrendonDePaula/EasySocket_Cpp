@@ -145,5 +145,9 @@ CJ-EasySocket:
 		###################################################################################################
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Cabeçalho basico para compilação:
-	g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Servidor
-	g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Cliente
+	Windows
+		(g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32) |->Servidor
+		(g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32) |->Cliente
+	Linux
+		(g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -pthread) |->Servidor
+		(g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -pthread) |->Cliente
