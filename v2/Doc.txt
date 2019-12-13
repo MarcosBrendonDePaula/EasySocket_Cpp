@@ -1,4 +1,5 @@
-ConJunto - EasyMultServer:
+CJ=Conjunto
+CJ - EasyMultServer:
 	EasyMultServer:
 		Funçoes:
 			EasyMultServer(int) : Método Construtor de classe.
@@ -30,9 +31,9 @@ ConJunto - EasyMultServer:
 			
 			nsock(list<int> *lista,vector<nsock*> *cn) : Metodo Construtor onde os parametros informados referenciam A (lista De ordem de chegada presente no EasyMultServer,E o vetor de Conexoes)
 			
-			getCliente() : Retorna O ponteiro socket Do tipo SOCKET ->(Classe Original do windows). 
+			getCliente() : Retorna O ponteiro socket Do tipo SOCKET if linux return int. 
 			
-			getDadosCliente() : Retorna o ponteiro sockaddr_in ->(Classe Original do windows); Cujo os dados serão de uma conexão especifica.
+			getDadosCliente() : Retorna o ponteiro sockaddr_in ; Cujo os dados serão de uma conexão especifica.
 			
 			start() : Inicia as Thread De escuta e envio de mensagens.
 			
@@ -130,9 +131,9 @@ CJ-EasySocket:
 				void tratamento(void *arg){ // Vai ser disparado quando chagar alguma mensagem.
 					cout<<Socket->getEntrada()<<endl;
 				}
-				WSADATA dll;
+				WSADATA dll; if linux comente
 				int main(){
-					WSAStartup(MAKEWORD(2,2), &dll); // Inicializa DLL WINDOWS
+					WSAStartup(MAKEWORD(2,2), &dll); // Inicializa DLL WINDOWS if linux comente
 					Socket=new EasySocket("127.0.0.1",25565,&tratamento); // METODO CONSTRUTOR COM IP,PORTA,FUNÇÃO TRATADORA
 					Socket->conectar(); // CONECTA AO SERVIDOR
 					while(true){			|
