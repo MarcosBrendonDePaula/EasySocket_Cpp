@@ -1,0 +1,149 @@
+CJ-EasyMultServer:
+	EasyMultServer:
+		Funçoes:
+			EasyMultServer(int) : Método Construtor de classe.
+				(int) informado refere-se a porta cujo o servidor será alocado.
+				
+			StartServer(void(*Processamento)(void*)) : Inicializa o servidor.
+				(void(*Processamento)(void*)) informado refere-se a função de tratamento de mensagens.
+				Ex: sv.StartServer(&tratamento); &tratamento -> Endereço da função.
+				
+			->: void tratamento(void *arg) Design da Função de tratamento.
+				(void *arg) Obrigatório repasse de Argumentos Pré-definidos.
+			
+			getConID(int i) : Retorna um ponteiro do tipo nsock cujo a id bata com a informada (i).
+				Caso não exista a (id)->x retorna null 
+			
+
+		Variavel-Publica:
+			
+			OrdemDeChegada -> Guarda as IDS em ordem de chegada cujo haja mandado uma mensagem.
+				Caso For a utilizar sempre remova a id cujo já foi utilizada.
+			
+			Conexoes -> Variavel do tipo vector<nsock*> que armazena Todos os clientes já conectados.
+				statica ja esta pré alocada ao usar a biblioteca.
+		OBS:
+			ID (0,1,2) Já estão em uso pelo EasyMultServer em Events
+
+	nsock:
+		Funçoes:
+			
+			nsock(list<int> *lista,vector<nsock*> *cn) : Metodo Construtor onde os parametros informados referenciam A (lista De ordem de chegada presente no EasyMultServer,E o vetor de Conexoes)
+			
+			getCliente() : Retorna O ponteiro socket Do tipo SOCKET ->(Classe Original do windows). 
+			
+			getDadosCliente() : Retorna o ponteiro sockaddr_in ->(Classe Original do windows); Cujo os dados serão de uma conexão especifica.
+			
+			start() : Inicia as Thread De escuta e envio de mensagens.
+			
+			getEntrada() : Pega E remove a entrada atual do buffer de recebimento do nsock atual.
+				retorna uma string.
+			
+			Enviar(string msg) : Envia uma mensagem (msg) ao cliente do nsock atual.
+				
+		Variavel-Publica:
+			id -> Variavel do Tipo inteiro cujo seu valor identifica a conexão atual.
+			evs -> Variavel Gerenciadora de disparo de eventos !Do tipo Events!.
+	
+	Exemplos:
+		###########################################################################################################
+		//!!!!!!O servidor Não precisa Inicializar a Dll do Windows, Dll sera inicializada automaticamente.!!!!!!
+		Codigo-Exemplo-SV:
+			#include <iostream>
+			#include "EasyMultServer.h"
+			#include <winsock2.h>
+			using namespace std;
+			string mensagem;
+			EasyMultServer sv(25565);
+			void tratamento(void *arg){
+				nsock* socket=(nsock*)arg; //No caso do servidor ao disparar o Evento de recepção sera informado o *arg com o ponteiro do cliente especifico do disoaro. 
+				socket->Enviar(mensagem); // Enviando mensagem para quem mandou algo.
+				cout<<socket->id<<endl;
+			}
+			int main(){
+				mensagem="Ola Mundo";
+				//inicializando servidor
+				sv.StartServer(&tratamento);
+				while(true){
+					string x;
+					cin>>x;
+				}
+			}
+		##############################################################################################################
+CJ-Events:
+	Events:
+		Funçoes:
+			
+			Events() : Metodo construtor,Inicializa todos os atributos da classe.
+			
+			addEvent(Event *E) : Adiciona um Evento* A lista de Possiveis eventos. 
+			
+			sendSignal(int ID) : Adiciona um Sinal na lista de sinais a Serem disparados.
+				Adiciona na lista a id "ID" cujo sera disparado.
+			
+			getEvent(int id) : Retorna O ponteiro do Event cujo A id pertença.
+				caso não exista a id na lista sera retornado NULL.
+			
+		Variavel-Publica:
+			static_Acess -> Variavel Estatica cujo tem o mesmo endereço da classe Eventos Alocada.
+				Usada para fazer acesso inter classes.
+				Do tipo Eventos*.
+	
+	
+	Event:
+		Funçoes:
+			
+			Event(int ID,void(*funcao)(void*),void *parametro) : Metodo construtor onde é passado (ID de referencia(Usuario Decide),Endereço da função Cujo Sera executada apos ser disparado).
+				EX_função: void* ReceiveFunction(void *arg) Formato Obrigatorio!.
+			
+		Variavel-Publica:
+			
+			ID -> Variavel que armazena A id Do evento Atual.
+			
+			parametros -> Variavel que armazena O endereço dos parametros a serem enviados quando a função for disparada.
+			
+			funcao -> Ponteiro que guarda a referencia da função que sera executada.
+
+CJ-EasySocket:
+	EasySocket:
+		Funçoes:
+			EasySocket(std::string ip, int porta,void(*funcao)()) : Metodo Construtor.
+			getEntrada() : Retorna A entrada do buffer.
+			qtEntradas() : Retorna A quantidade de entradas armazenadas no buffer.
+			conectar() : Conecta no Servidor informado no metodo construtor.
+			Enviar(std::string msg) : Envia uma mensagem de string para o servidor.
+			Desconectar() : Desconecta do servidor.
+		Variavel-Publica:
+			bffSiz -> Define o tamanho do buffer de recebimento <int> OBS. Não me lembro se estou usando.
+			
+		Exemplos:
+			void(*funcao)() : 
+				void tratamento(void *arg){
+					cout<<Socket->getEntrada()<<endl;
+				}
+		###############################################################################################
+			Codigo Cliente:
+				#include "EasySocket.h"
+				#include <iostream>
+				using namespace std;
+				EasySocket *Socket; // Ponteiro para poder utilizar globalmente.
+				void tratamento(void *arg){ // Vai ser disparado quando chagar alguma mensagem.
+					cout<<Socket->getEntrada()<<endl;
+				}
+				WSADATA dll;
+				int main(){
+					WSAStartup(MAKEWORD(2,2), &dll); // Inicializa DLL WINDOWS
+					Socket=new EasySocket("127.0.0.1",25565,&tratamento); // METODO CONSTRUTOR COM IP,PORTA,FUNÇÃO TRATADORA
+					Socket->conectar(); // CONECTA AO SERVIDOR
+					while(true){			|
+						string x;           |So para manter O cliente Aberto sem utilizar Cpu
+						cin>>x;				|
+						Socket->Enviar(x);	|
+					}
+					return 0;
+				}
+		###################################################################################################
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Cabeçalho basico para compilação:
+	g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Servidor
+	g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Cliente

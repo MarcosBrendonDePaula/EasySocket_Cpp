@@ -7,10 +7,12 @@
     #include <stdio.h>
     class Event{
     public:
-        Event(int ID,void(*funcao)(void*),void *parametro);
-        int ID;
-        void *parametros;
-        void(*funcao)(void*);
+            Event(int ID,void(*funcao)(void*),void *parametro);
+            Event(int ID,void(*funcao)(void*));
+            Event(int ID,void(*funcao)());
+            int ID;
+            void *parametros;
+            void(*funcao)(void*);
     };
     class Events{
     public:
@@ -19,6 +21,8 @@
         Events();
         void addEvent(Event *E);
         void sendSignal(int ID);
+        Event* getEvent(int id);
+        bool Paralel;
     private:
         bool Debug;
         pthread_t executor;
