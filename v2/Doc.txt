@@ -1,4 +1,4 @@
-CJ-EasyMultServer:
+ConJunto - EasyMultServer:
 	EasyMultServer:
 		Funçoes:
 			EasyMultServer(int) : Método Construtor de classe.
