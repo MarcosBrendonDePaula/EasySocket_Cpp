@@ -1,7 +1,17 @@
 #pragma once
-#include <WinSock2.h>
+#ifdef _WIN32
+	#include <process.h>
+	#include <winsock2.h>
+#elif __linux__
+	#include <pthread.h>
+	#include <netinet/in.h>
+	#include <unistd.h>
+	#include <arpa/inet.h>
+	#define closesocket close
+	#define SOCKET int
+#endif
 #include <iostream>
-#include <process.h>
+#include <cstring>
 #include <list>
 #include "Events.h"
 using namespace std;
@@ -15,7 +25,13 @@ private:
 	bool closed;
 public:
 	static int bffSiz;
-	static void ReceiverDefault(void *arg);
+	#ifdef _WIN32
+		static void ReceiverDefault(void *arg);
+	#elif __linux__
+		pthread_t ThreadCliente;
+		static void* ReceiverDefault(void *arg);
+	#endif
+	
 	EasySocket(std::string ip, int porta,void(*funcao)(void *arg));
 	string getEntrada();
 	int qtEntradas();

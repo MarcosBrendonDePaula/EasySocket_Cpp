@@ -1,8 +1,5 @@
 #include "EasySocket.h"
-#include <iostream>
-#include <cstring>
-#include <process.h>
-
+#define SOCKET int
 EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg)){
 	Events::static_Acess->addEvent(new Event(3,funcao,NULL));
 	memset(&this->InformacoesConection, 0x0, sizeof(this->InformacoesConection));
@@ -21,7 +18,11 @@ int EasySocket::conectar(){
 		return 0;
 	}
 	this->closed=false;
-	_beginthread(EasySocket::ReceiverDefault, 0, this);
+	#ifdef _WIN32
+		_beginthread(EasySocket::ReceiverDefault, 0, this);
+	#elif __linux__
+		pthread_create(&this->ThreadCliente,NULL,EasySocket::ReceiverDefault,this);
+	#endif
 	return 1;
 }
 
@@ -32,8 +33,11 @@ int EasySocket::Enviar(std::string msg){
 	}
 	return 1;
 }
-
-void EasySocket::ReceiverDefault(void *arg){
+#ifdef _WIN32
+	void EasySocket::ReceiverDefault(void *arg){
+#elif __linux__
+	void* EasySocket::ReceiverDefault(void *arg){
+#endif
 	EasySocket *sk = (EasySocket*)arg;
 	char buffer[1024];
 	memset(buffer, 0x0, sizeof(buffer));
