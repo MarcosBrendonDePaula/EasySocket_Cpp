@@ -1,40 +1,33 @@
 #include <iostream>
 #include "EasyMultServer.h"
+#include "EasySocket.h"
 #include <stdexcept>
 #include <sstream>
-#include "Json.h"
+#include <map>
 using namespace std;
-EasyMultServer sv(25565);
-Json novo;
+EasyMultServer *sv;
 void tratamento(void *arg){
 	nsock* socket=(nsock*)arg;
-	try{
-        cout<<socket->getEntrada()<<endl;
-        socket->Enviar(novo.to_string());
-    }catch(exception& erro){
-        cout<<erro.what()<<endl;
-    }
+    cout<<"Chegou:"<<socket->getEntrada()<<endl;
 }
 void Aceitado(void *arg){
     nsock *aceitado = (nsock*)arg;
     cout<<"id aceita:"<< aceitado->id << endl;
 }
-int main(){
-    
-    novo.addVar("anime","aldnoha:Zero");
-    novo.addVarPath("mensagens","1","Aloha");
-    novo.addVarPath("mensagens","2","bilibili");
-    novo.addVarPath("mensagens","3","kakaka");
-    novo.addVarPath("mensagens","4","digo doido");
-    novo.addVarPath("mensagens","5","maluko");
-    novo.addVarPath("mensagens","6","vish");
-    novo.addVarPath("kits","pvp","espada,arco,flexa");
-    novo.addVarPath("kits","sobrevivencia","machado,faca,picareta");
 
-	sv.StartServer(&tratamento,1,&Aceitado);
-	
+void tratamento1(void *arg){
+
+}
+
+int main(){
+    Events *ev=new Events();
+    sv = new EasyMultServer(25565,ev);
+	sv->StartServer(&tratamento,10,&Aceitado);
+    EasySocket *con;
 	while(true){
 		int x;
 		cin>>x;
-	}
+        con = new EasySocket("127.0.0.1",25565,&tratamento1,ev);
+        con->conectar();
+    }
 }

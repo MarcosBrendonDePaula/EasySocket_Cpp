@@ -1,4 +1,5 @@
 #include "nsock.h"
+Events nsock::evs;
 #ifdef _WIN32
 	void nsock::ReceiveFunction(void *arg)
 #elif __linux__
@@ -13,8 +14,8 @@
 	while((recv(This->cliente,buffer,sizeof(buffer),0)>0) && !This->erro){
 		string entrada(buffer);
 		This->Entrada.push_back(entrada);
-		This->Evs->getEvent(1)->parametros=This;
-		This->Evs->sendSignal(1);
+		nsock::evs.getEvent(1)->parametros=This;
+		nsock::evs.sendSignal(1);
 		memset(buffer,0x0,sizeof(buffer));
 	}
 	map<int,nsock*>::iterator it;
@@ -25,9 +26,8 @@
 	#endif
 }
 
-nsock::nsock(list<int> *lista,map<int,nsock*> *cn,Events *Evs)
+nsock::nsock(list<int> *lista,map<int,nsock*> *cn)
 {
-	this->Evs = Evs;
 	this->ordem=lista;
 	this->connections=cn;
 	memset(&this->DadosCliente,0x0,sizeof(this->DadosCliente));

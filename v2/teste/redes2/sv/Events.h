@@ -1,4 +1,3 @@
-#pragma once
 #ifdef __linux__
     #include <iostream>
     #include <pthread.h>

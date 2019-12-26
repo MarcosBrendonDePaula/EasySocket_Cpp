@@ -6,6 +6,7 @@
 	#include<unistd.h>
 
 #endif
+
 #include <iostream>
 #include <list>
 #include <vector>
@@ -24,7 +25,6 @@ class EasyMultServer{
 			int ServeSock;
 			pthread_t ThreadRecepcao;
 		#endif
-		Events *Evs;
 		bool opened;
 	public:
 		map<int,nsock*> Conections;
@@ -32,9 +32,10 @@ class EasyMultServer{
 		#ifdef _WIN32
 			static void Recebimento(void *arg);
 		#elif __linux__
+			Events *Eventos;
 			static void* Recebimento(void *arg);
 		#endif
-		EasyMultServer(int porta,Events *Evs);
+		EasyMultServer(int porta);
 		bool StartServer(void(*Processamento)(void*));
 		bool StartServer(void(*Processamento)(void*),int limit);
 		bool StartServer(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*));

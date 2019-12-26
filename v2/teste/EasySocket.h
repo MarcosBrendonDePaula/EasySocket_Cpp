@@ -1,3 +1,4 @@
+#pragma once
 #ifdef _WIN32
 	#include <process.h>
 	#include <winsock2.h>
@@ -20,7 +21,7 @@ private:
 	SOCKET conection;
 	sockaddr_in InformacoesConection;
 	list<string> Entradas;
-	Events *Evs;
+	Events Eventos;
 	bool closed;
 public:
 	static int bffSiz;
@@ -31,7 +32,7 @@ public:
 		static void* ReceiverDefault(void *arg);
 	#endif
 	
-	EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events *evs);
+	EasySocket(std::string ip, int porta,void(*funcao)(void *arg));
 	string getEntrada();
 	int qtEntradas();
 	int conectar();
@@ -40,3 +41,4 @@ public:
 	void Desconectar();
 	~EasySocket();
 };
+

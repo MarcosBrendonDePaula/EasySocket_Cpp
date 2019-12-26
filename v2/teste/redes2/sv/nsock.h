@@ -28,11 +28,11 @@ class nsock{
 		list<int> *ordem;
 		//vector<nsock*> *conexoes;
 		map<int,nsock*> *connections;
-		Events *Evs;
 		int erro;
 	public:
 		int id;
-		nsock(list<int> *lista,map<int,nsock*> *cn,Events *Evs);
+		static Events evs;
+		nsock(list<int> *lista,map<int,nsock*> *cn);
 		#ifdef _WIN32
 			static void ReceiveFunction(void *arg);
 			SOCKET* getCliente();

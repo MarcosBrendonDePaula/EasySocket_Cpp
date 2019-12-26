@@ -6,7 +6,7 @@ list<int> EasyMultServer::OrdemDeChegada;
 		EasyMultServer* This=(EasyMultServer*)arg;
 		This->id=1;
 		while(This->opened){
-			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections,This->Evs);
+			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections);
 			#ifdef _WIN32
 				SOCKET *cliente=atual->getCliente();
 			#elif __linux__
@@ -17,9 +17,9 @@ list<int> EasyMultServer::OrdemDeChegada;
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
 			if((*cliente>0)*(This->limit>This->Conections.size())*This->opened){
 				cout<<"Conexao Aceita"<<endl;
-				if(This->Evs->getEvent(2)){
-					This->Evs->getEvent(2)->parametros = atual;
-					This->Evs->sendSignal(2);
+				if(Events::static_Acess->getEvent(2)){
+					Events::static_Acess->getEvent(2)->parametros = atual;
+					Events::static_Acess->sendSignal(2);
 				}
 				atual->id=This->id;
 				This->Conections[This->id]=atual;
@@ -38,7 +38,7 @@ list<int> EasyMultServer::OrdemDeChegada;
 		EasyMultServer* This=(EasyMultServer*)arg;
 		This->id=1;
 		while(This->opened){
-			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections,This->Evs);
+			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections);
 			#ifdef _WIN32
 				SOCKET *cliente=atual->getCliente();
 			#elif __linux__
@@ -49,9 +49,9 @@ list<int> EasyMultServer::OrdemDeChegada;
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
 			if((*cliente>0)*(This->limit>This->Conections.size())*This->opened){
 				cout<<"Conexao Aceita"<<endl;
-				if(This->Evs->getEvent(2)){
-					This->Evs->getEvent(2)->parametros = atual;
-					This->Evs->sendSignal(2);
+				if(Events::static_Acess->getEvent(2)){
+					Events::static_Acess->getEvent(2)->parametros = atual;
+					Events::static_Acess->sendSignal(2);
 				}
 				atual->id=This->id;
 				This->Conections[This->id]=atual;
@@ -70,11 +70,10 @@ nsock* EasyMultServer::getConID(int i)
 	return this->Conections[i];
 }
 
-EasyMultServer::EasyMultServer(int porta,Events *Evs){
+EasyMultServer::EasyMultServer(int porta){
 	#ifdef _WIN32
 		WSAStartup(MAKEWORD(2,2), &this->dll);
     #endif
-	this->Evs=Evs;
 	this->ServeSock = socket(AF_INET, SOCK_STREAM, 0);
 	memset(&this->DadosSocket,0, sizeof(this->DadosSocket));
     this->DadosSocket.sin_family = AF_INET;
@@ -84,7 +83,7 @@ EasyMultServer::EasyMultServer(int porta,Events *Evs){
 
 bool EasyMultServer::StartServer(void(*Processamento)(void*)){
 	this->limit=999999;
-	this->Evs->addEvent(new Event(1,Processamento,NULL));
+	Events::static_Acess->addEvent(new Event(1,Processamento,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
 		this->opened=false;
 		closesocket(this->ServeSock);
@@ -105,7 +104,7 @@ bool EasyMultServer::StartServer(void(*Processamento)(void*)){
 
 bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit){
 	this->limit=limit;
-	this->Evs->addEvent(new Event(1,Processamento,NULL));
+	Events::static_Acess->addEvent(new Event(1,Processamento,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
 		closesocket(this->ServeSock);
 		this->opened=false;
@@ -126,8 +125,8 @@ bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit){
 }
 bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*)){
 	this->limit=limit;
-	this->Evs->addEvent(new Event(2,acceptFunction,NULL));
-	this->Evs->addEvent(new Event(1,Processamento,NULL));
+	Events::static_Acess->addEvent(new Event(2,acceptFunction,NULL));
+	Events::static_Acess->addEvent(new Event(1,Processamento,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
 		closesocket(this->ServeSock);
 		this->opened=false;
