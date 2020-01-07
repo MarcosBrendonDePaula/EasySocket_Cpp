@@ -1,10 +1,8 @@
 #include "EasySocket.h"
-#include <iostream>
-#include <cstring>
-#include <process.h>
-
-EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg)){
-	Events::static_Acess->addEvent(new Event(3,funcao,NULL));
+#define SOCKET int
+EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events *evs){
+	this->Evs = evs;
+	this->Evs->addEvent(new Event(3,funcao,NULL));
 	memset(&this->InformacoesConection, 0x0, sizeof(this->InformacoesConection));
 	this->InformacoesConection.sin_port = htons(porta);
 	this->InformacoesConection.sin_addr.s_addr = inet_addr(ip.c_str());
@@ -21,7 +19,11 @@ int EasySocket::conectar(){
 		return 0;
 	}
 	this->closed=false;
-	_beginthread(EasySocket::ReceiverDefault, 0, this);
+	#ifdef _WIN32
+		_beginthread(EasySocket::ReceiverDefault, 0, this);
+	#elif __linux__
+		pthread_create(&this->ThreadCliente,NULL,EasySocket::ReceiverDefault,this);
+	#endif
 	return 1;
 }
 
@@ -32,8 +34,11 @@ int EasySocket::Enviar(std::string msg){
 	}
 	return 1;
 }
-
-void EasySocket::ReceiverDefault(void *arg){
+#ifdef _WIN32
+	void EasySocket::ReceiverDefault(void *arg){
+#elif __linux__
+	void* EasySocket::ReceiverDefault(void *arg){
+#endif
 	EasySocket *sk = (EasySocket*)arg;
 	char buffer[1024];
 	memset(buffer, 0x0, sizeof(buffer));
@@ -42,7 +47,7 @@ void EasySocket::ReceiverDefault(void *arg){
 		string nm(buffer);
 		sk->Entradas.push_back(nm);
 		memset(buffer, 0x0, sizeof(buffer));
-		Events::static_Acess->sendSignal(3);
+		sk->Evs->sendSignal(3);
 	}
 	std::cout << "Desconectado" << std::endl;
 	closesocket(sk->conection);

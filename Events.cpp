@@ -43,7 +43,9 @@
             This->LEDP.pop_front();
         }
     }
-
+    Event* Events::getEvent(int id){
+        return this->Leventos[id];
+    }
     /*
         Construtor Evento
     */
@@ -51,6 +53,11 @@
         this->funcao=funcao;
         this->ID=ID;
         this->parametros=parametro;
+    }
+    Event::Event(int ID,void(*funcao)(void*)){
+        this->funcao=funcao;
+        this->ID=ID;
+        this->parametros=NULL;
     }
 #elif _WIN32
     /*

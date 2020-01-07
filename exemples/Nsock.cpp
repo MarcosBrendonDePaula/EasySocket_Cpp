@@ -1,13 +1,13 @@
-#include "nsock.h"
+#include "Nsock.h"
 #ifdef _WIN32
-	void nsock::ReceiveFunction(void *arg)
+	void Nsock::ReceiveFunction(void *arg)
 #elif __linux__
 	#define SOCKET int
 	#define closesocket close
-	void* nsock::ReceiveFunction(void *arg)
+	void* Nsock::ReceiveFunction(void *arg)
 #endif
 {
-	nsock* This=(nsock*)arg;
+	Nsock* This=(Nsock*)arg;
 	char buffer[2048];
 	memset(buffer,0x0,sizeof(buffer));
 	while((recv(This->cliente,buffer,sizeof(buffer),0)>0) && !This->erro){
@@ -17,7 +17,7 @@
 		This->Evs->sendSignal(1);
 		memset(buffer,0x0,sizeof(buffer));
 	}
-	map<int,nsock*>::iterator it;
+	map<int,Nsock*>::iterator it;
 	it=This->connections->find(This->id);
 	This->connections->erase(it);
 	#ifdef _WIN32
@@ -25,31 +25,31 @@
 	#endif
 }
 
-nsock::nsock(list<int> *lista,map<int,nsock*> *cn,Events *Evs)
+Nsock::Nsock(list<int> *lista,map<int,Nsock*> *cn,Events *Evs)
 {
 	this->Evs = Evs;
 	this->ordem=lista;
 	this->connections=cn;
 	memset(&this->DadosCliente,0x0,sizeof(this->DadosCliente));
 }
-SOCKET* nsock::getCliente()
+SOCKET* Nsock::getClient()
 {
 	return &this->cliente;
 }
-struct sockaddr_in* nsock::getDadosCliente()
+struct sockaddr_in* Nsock::getSocketInfo()
 {
 	return &this->DadosCliente;
 }
-int nsock::start()
+int Nsock::start()
 {
 	#ifdef _WIN32
-		_beginthread(nsock::ReceiveFunction,0,this);
+		_beginthread(Nsock::ReceiveFunction,0,this);
 	#elif __linux__
-		pthread_create(&this->ThreadCliente,NULL,nsock::ReceiveFunction,this);
+		pthread_create(&this->ThreadCliente,NULL,Nsock::ReceiveFunction,this);
 	#endif
 	return 1;
 }
-string nsock::getEntrada()
+string Nsock::getInput()
 {
 	if(this->Entrada.empty()){
 		throw std::runtime_error("Erro Sem Dados No buffer");
@@ -58,18 +58,18 @@ string nsock::getEntrada()
 	this->Entrada.pop_front();
 	return entrada;
 }
-int nsock::Enviar(string msg)
+int Nsock::SendMsg(string msg)
 {
 	int status=send(this->cliente,msg.c_str(),msg.length(),0);
 	if(status<0){
 		this->erro=1;
-		map<int,nsock*>::iterator it;
+		map<int,Nsock*>::iterator it;
 		it=this->connections->find(this->id);
 		this->connections->erase(it);
 		return 0;
 	}
 	return 1;
 }
-void nsock::Close(){
+void Nsock::Close(){
 	closesocket(this->cliente);
 }

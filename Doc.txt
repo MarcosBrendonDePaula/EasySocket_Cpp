@@ -1,4 +1,5 @@
-CJ-EasyMultServer:
+CJ=Conjunto
+CJ - EasyMultServer:
 	EasyMultServer:
 		Funçoes:
 			EasyMultServer(int) : Método Construtor de classe.
@@ -22,15 +23,17 @@ CJ-EasyMultServer:
 			
 			Conexoes -> Variavel do tipo vector<nsock*> que armazena Todos os clientes já conectados.
 				statica ja esta pré alocada ao usar a biblioteca.
+		OBS:
+			ID (0,1,2) Já estão em uso pelo EasyMultServer em Events
 
 	nsock:
 		Funçoes:
 			
 			nsock(list<int> *lista,vector<nsock*> *cn) : Metodo Construtor onde os parametros informados referenciam A (lista De ordem de chegada presente no EasyMultServer,E o vetor de Conexoes)
 			
-			getCliente() : Retorna O ponteiro socket Do tipo SOCKET ->(Classe Original do windows). 
+			getCliente() : Retorna O ponteiro socket Do tipo SOCKET if linux return int. 
 			
-			getDadosCliente() : Retorna o ponteiro sockaddr_in ->(Classe Original do windows); Cujo os dados serão de uma conexão especifica.
+			getDadosCliente() : Retorna o ponteiro sockaddr_in ; Cujo os dados serão de uma conexão especifica.
 			
 			start() : Inicia as Thread De escuta e envio de mensagens.
 			
@@ -81,11 +84,6 @@ CJ-Events:
 			
 			getEvent(int id) : Retorna O ponteiro do Event cujo A id pertença.
 				caso não exista a id na lista sera retornado NULL.
-			
-		Variavel-Publica:
-			static_Acess -> Variavel Estatica cujo tem o mesmo endereço da classe Eventos Alocada.
-				Usada para fazer acesso inter classes.
-				Do tipo Eventos*.
 	
 	
 	Event:
@@ -128,9 +126,9 @@ CJ-EasySocket:
 				void tratamento(void *arg){ // Vai ser disparado quando chagar alguma mensagem.
 					cout<<Socket->getEntrada()<<endl;
 				}
-				WSADATA dll;
+				WSADATA dll; if linux comente
 				int main(){
-					WSAStartup(MAKEWORD(2,2), &dll); // Inicializa DLL WINDOWS
+					WSAStartup(MAKEWORD(2,2), &dll); // Inicializa DLL WINDOWS if linux comente
 					Socket=new EasySocket("127.0.0.1",25565,&tratamento); // METODO CONSTRUTOR COM IP,PORTA,FUNÇÃO TRATADORA
 					Socket->conectar(); // CONECTA AO SERVIDOR
 					while(true){			|
@@ -143,5 +141,9 @@ CJ-EasySocket:
 		###################################################################################################
 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Cabeçalho basico para compilação:
-	g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Servidor
-	g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32 |Cliente
+	Windows
+		(g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32) |->Servidor
+		(g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -l ws2_32) |->Cliente
+	Linux
+		(g++ EasyMultServer.cpp Events.cpp nsock.cpp CodigoFonte.cpp -o NomeDeSaida -pthread) |->Servidor
+		(g++ Events.cpp EasySocket.cpp CodigoFonte.cpp -o NomeDeSaida -pthread) |->Cliente

@@ -1,17 +1,17 @@
+#pragma once
 #ifdef _WIN32
-	#include <winsock2.h>
+	#include <wiNsock2.h>
 #elif __linux__
 	#include<netinet/in.h>
 	#include<pthread.h>
 	#include<unistd.h>
 
 #endif
-
 #include <iostream>
 #include <list>
 #include <vector>
 #include <cstring>
-#include "nsock.h"
+#include "Nsock.h"
 #include <map>
 using namespace std;
 class EasyMultServer{
@@ -25,25 +25,25 @@ class EasyMultServer{
 			int ServeSock;
 			pthread_t ThreadRecepcao;
 		#endif
+		Events *Evs;
 		bool opened;
 	public:
-		map<int,nsock*> Conections;
-		static list<int> OrdemDeChegada;
+		map<int,Nsock*> Connections;
+		static list<int> inputOrders;
 		#ifdef _WIN32
 			static void Recebimento(void *arg);
 		#elif __linux__
-			Events *Eventos;
 			static void* Recebimento(void *arg);
 		#endif
-		EasyMultServer(int porta);
-		bool StartServer(void(*Processamento)(void*));
-		bool StartServer(void(*Processamento)(void*),int limit);
-		bool StartServer(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*));
-		nsock* getConID(int i);
+		EasyMultServer(int porta,Events *Evs);
+		bool Start(void(*Processamento)(void*));
+		bool Start(void(*Processamento)(void*),int limit);
+		bool Start(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*));
+		Nsock* getId(int i);
 		
 		bool isOpened();
 		void setLimit(int limit);
 		int getLimit();
-		int getConectionsSize();
-		bool CloseServer();
+		int getConnectionsSize();
+		bool Close();
 };

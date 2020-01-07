@@ -1,3 +1,4 @@
+#pragma once
 #ifdef _WIN32
 	#include <winsock2.h>
 	#include <process.h>
@@ -15,7 +16,7 @@
 #include <map>
 
 using namespace std;
-class nsock{
+class Nsock{
 	private:
 		#ifdef _WIN32
 			SOCKET cliente;
@@ -26,23 +27,23 @@ class nsock{
 		struct sockaddr_in DadosCliente;
 		list<string> Entrada;
 		list<int> *ordem;
-		//vector<nsock*> *conexoes;
-		map<int,nsock*> *connections;
+		//vector<Nsock*> *conexoes;
+		map<int,Nsock*> *connections;
+		Events *Evs;
 		int erro;
 	public:
 		int id;
-		static Events evs;
-		nsock(list<int> *lista,map<int,nsock*> *cn);
+		Nsock(list<int> *lista,map<int,Nsock*> *cn,Events *Evs);
 		#ifdef _WIN32
 			static void ReceiveFunction(void *arg);
-			SOCKET* getCliente();
+			SOCKET* getClient();
 		#elif __linux__
 			static void* ReceiveFunction(void *arg);
-			int* getCliente();
+			int* getClient();
 		#endif
-		struct sockaddr_in* getDadosCliente();
+		struct sockaddr_in* getSocketInfo();
 		int start();
 		void Close();
-		string getEntrada();
-		int Enviar(string msg);
+		string getInput();
+		int SendMsg(string msg);
 };

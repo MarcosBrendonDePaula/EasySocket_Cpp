@@ -1,28 +1,28 @@
 #include "EasyMultServer.h"
 
-list<int> EasyMultServer::OrdemDeChegada;
+list<int> EasyMultServer::inputOrders;
 #ifdef _WIN32
 	void EasyMultServer::Recebimento(void *arg){
 		EasyMultServer* This=(EasyMultServer*)arg;
 		This->id=1;
 		while(This->opened){
-			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections,This->Evs);
+			Nsock* atual=new Nsock(&EasyMultServer::inputOrders,&This->Connections,This->Evs);
 			#ifdef _WIN32
-				SOCKET *cliente=atual->getCliente();
+				SOCKET *cliente=atual->getClient();
 			#elif __linux__
-				int *cliente=atual->getCliente();
+				int *cliente=atual->getClient();
 			#endif
-			struct sockaddr_in* DadosCliente=atual->getDadosCliente();
+			struct sockaddr_in* DadosCliente=atual->getSocketInfo();
 			int tam=sizeof(*DadosCliente);
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
-			if((*cliente>0)*(This->limit>This->Conections.size())*This->opened){
+			if((*cliente>0)*(This->limit>This->Connections.size())*This->opened){
 				cout<<"Conexao Aceita"<<endl;
 				if(This->Evs->getEvent(2)){
 					This->Evs->getEvent(2)->parametros = atual;
 					This->Evs->sendSignal(2);
 				}
 				atual->id=This->id;
-				This->Conections[This->id]=atual;
+				This->Connections[This->id]=atual;
 				atual->start();
 				This->id++;
 			}else{
@@ -38,23 +38,23 @@ list<int> EasyMultServer::OrdemDeChegada;
 		EasyMultServer* This=(EasyMultServer*)arg;
 		This->id=1;
 		while(This->opened){
-			nsock* atual=new nsock(&EasyMultServer::OrdemDeChegada,&This->Conections,This->Evs);
+			Nsock* atual=new Nsock(&EasyMultServer::inputOrders,&This->Connections,This->Evs);
 			#ifdef _WIN32
-				SOCKET *cliente=atual->getCliente();
+				SOCKET *cliente=atual->getClient();
 			#elif __linux__
-				int *cliente=atual->getCliente();
+				int *cliente=atual->getClient();
 			#endif
-			struct sockaddr_in* DadosCliente=atual->getDadosCliente();
+			struct sockaddr_in* DadosCliente=atual->getSocketInfo();
 			socklen_t tam=sizeof(*DadosCliente);
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
-			if((*cliente>0)*(This->limit>This->Conections.size())*This->opened){
+			if((*cliente>0)*(This->limit>This->Connections.size())*This->opened){
 				cout<<"Conexao Aceita"<<endl;
 				if(This->Evs->getEvent(2)){
 					This->Evs->getEvent(2)->parametros = atual;
 					This->Evs->sendSignal(2);
 				}
 				atual->id=This->id;
-				This->Conections[This->id]=atual;
+				This->Connections[This->id]=atual;
 				atual->start();
 				This->id++;
 			}else{
@@ -65,9 +65,9 @@ list<int> EasyMultServer::OrdemDeChegada;
 	}
 #endif
 
-nsock* EasyMultServer::getConID(int i)
+Nsock* EasyMultServer::getId(int i)
 {
-	return this->Conections[i];
+	return this->Connections[i];
 }
 
 EasyMultServer::EasyMultServer(int porta,Events *Evs){
@@ -82,7 +82,7 @@ EasyMultServer::EasyMultServer(int porta,Events *Evs){
     this->DadosSocket.sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
-bool EasyMultServer::StartServer(void(*Processamento)(void*)){
+bool EasyMultServer::Start(void(*Processamento)(void*)){
 	this->limit=999999;
 	this->Evs->addEvent(new Event(1,Processamento,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
@@ -103,7 +103,7 @@ bool EasyMultServer::StartServer(void(*Processamento)(void*)){
 	return true;
 }
 
-bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit){
+bool EasyMultServer::Start(void(*Processamento)(void*),int limit){
 	this->limit=limit;
 	this->Evs->addEvent(new Event(1,Processamento,NULL));
 	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
@@ -124,7 +124,7 @@ bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit){
 	#endif
 	return true;
 }
-bool EasyMultServer::StartServer(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*)){
+bool EasyMultServer::Start(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*)){
 	this->limit=limit;
 	this->Evs->addEvent(new Event(2,acceptFunction,NULL));
 	this->Evs->addEvent(new Event(1,Processamento,NULL));
@@ -150,7 +150,7 @@ bool EasyMultServer::isOpened(){
 	return this->opened;
 }
 
-bool EasyMultServer::CloseServer(){
+bool EasyMultServer::Close(){
 	this->opened=false;
 	return true;
 }
