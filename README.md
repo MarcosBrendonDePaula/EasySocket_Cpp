@@ -7,5 +7,5 @@ ________________________________________________________________________________
 
 ###### SO: Linux|Windows
 
-Compiling the example: (g++ Easy*.cpp Events.cpp Nsock.cpp -o main -pthread) -> LINUX
-Compiling the example: (g++ Easy*.cpp Events.cpp Nsock.cpp -o main -lws2_32) -> Windows
+Compiling the example: (g++ Easy*.cpp Events.cpp Nsock.cpp main.cpp -o main -pthread) -> LINUX
+Compiling the example: (g++ Easy*.cpp Events.cpp Nsock.cpp main.cpp -o main -lws2_32) -> Windows
