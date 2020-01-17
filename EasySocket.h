@@ -26,6 +26,7 @@ private:
 public:
 	static int bffSiz;
 	#ifdef _WIN32
+		WSADATA dll;
 		static void ReceiverDefault(void *arg);
 	#elif __linux__
 		pthread_t ThreadCliente;

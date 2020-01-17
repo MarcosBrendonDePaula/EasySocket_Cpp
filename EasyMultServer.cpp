@@ -62,6 +62,7 @@ list<int> EasyMultServer::inputOrders;
 				free(atual);
 			}
 		}
+		return NULL;
 	}
 #endif
 

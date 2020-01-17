@@ -24,9 +24,11 @@
 	map<int,Nsock*>::iterator it;
 	it=This->connections->find(This->id);
 	This->connections->erase(it);
-	#ifdef _WIN32
-		return;
-	#endif
+#ifdef _WIN32
+	return;
+#elif __linux__
+	return NULL;
+#endif
 }
 
 Nsock::Nsock(list<int> *lista,map<int,Nsock*> *cn,Events *Evs)

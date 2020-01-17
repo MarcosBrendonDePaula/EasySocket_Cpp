@@ -1,6 +1,9 @@
 #include "EasySocket.h"
 #define SOCKET int
 EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events *evs){
+	#ifdef _WIN32
+		WSAStartup(MAKEWORD(2,2), &this->dll);
+    #endif
 	this->Evs = evs;
 	this->Evs->addEvent(new Event(3,funcao,NULL));
 	memset(&this->InformacoesConection, 0x0, sizeof(this->InformacoesConection));
@@ -34,6 +37,7 @@ int EasySocket::Enviar(std::string msg){
 	}
 	return 1;
 }
+
 #ifdef _WIN32
 	void EasySocket::ReceiverDefault(void *arg){
 #elif __linux__
@@ -47,11 +51,17 @@ int EasySocket::Enviar(std::string msg){
 		string nm(buffer);
 		sk->Entradas.push_back(nm);
 		memset(buffer, 0x0, sizeof(buffer));
+		sk->Evs->getEvent(3)->parametros=sk;
 		sk->Evs->sendSignal(3);
 	}
 	std::cout << "Desconectado" << std::endl;
 	closesocket(sk->conection);
 	sk->closed=true;
+#ifdef _WIN32
+	return;
+#elif __linux__
+	return NULL;
+#endif
 }
 
 string EasySocket::getEntrada(){
