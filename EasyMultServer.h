@@ -27,6 +27,7 @@ class EasyMultServer{
 		#endif
 		Events *Evs;
 		bool opened;
+		bool Bstart();
 	public:
 		map<int,Nsock*> Connections;
 		static list<int> inputOrders;
@@ -39,6 +40,7 @@ class EasyMultServer{
 		bool Start(void(*Processamento)(void*));
 		bool Start(void(*Processamento)(void*),int limit);
 		bool Start(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*));
+		bool Start(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*),void(*Disconnection)(void*));
 		Nsock* getId(int i);
 		
 		bool isOpened();

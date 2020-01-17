@@ -146,6 +146,31 @@ bool EasyMultServer::Start(void(*Processamento)(void*),int limit,void(*acceptFun
 	#endif
 	return true;
 }
+
+bool EasyMultServer::Start(void(*Processamento)(void*),int limit,void(*acceptFunction)(void*),void(*Disconnection)(void*)){
+	this->limit=limit;
+	this->Evs->addEvent(new Event(2,acceptFunction,NULL));
+	this->Evs->addEvent(new Event(1,Processamento,NULL));
+	this->Evs->addEvent(new Event(3,Disconnection,NULL));
+	if (bind(this->ServeSock, (struct sockaddr *) &this->DadosSocket, sizeof(this->DadosSocket)) < 0){
+		closesocket(this->ServeSock);
+		this->opened=false;
+		return false;
+	}
+	if (listen(this->ServeSock, this->limit) < 0){
+		closesocket(this->ServeSock);
+		this->opened=false;
+		return false;
+	}
+	this->opened=true;
+	#ifdef _WIN32
+		_beginthread(EasyMultServer::Recebimento,0,this);
+	#elif __linux__
+		pthread_create(&this->ThreadRecepcao,NULL,EasyMultServer::Recebimento,this);
+	#endif
+	return true;
+}
+
 bool EasyMultServer::isOpened(){
 	return this->opened;
 }

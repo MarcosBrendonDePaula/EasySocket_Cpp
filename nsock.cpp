@@ -17,6 +17,10 @@
 		This->Evs->sendSignal(1);
 		memset(buffer,0x0,sizeof(buffer));
 	}
+	if(This->Evs->getEvent(3)){
+		This->Evs->getEvent(3)->parametros = This;
+		This->Evs->sendSignal(3);
+	}
 	map<int,Nsock*>::iterator it;
 	it=This->connections->find(This->id);
 	This->connections->erase(it);
@@ -40,8 +44,7 @@ struct sockaddr_in* Nsock::getSocketInfo()
 {
 	return &this->DadosCliente;
 }
-int Nsock::start()
-{
+int Nsock::start(){
 	#ifdef _WIN32
 		_beginthread(Nsock::ReceiveFunction,0,this);
 	#elif __linux__
