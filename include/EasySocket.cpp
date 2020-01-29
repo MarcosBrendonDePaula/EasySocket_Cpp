@@ -1,6 +1,13 @@
 #include "EasySocket.h"
-#define SOCKET int
+#ifdef __linux__
+	#define SOCKET int
+#endif
 EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events *evs){
+	strcpy(this->vazio,"empty");
+	this->Buffersize=1024;
+	#ifdef _WIN32
+		WSAStartup(MAKEWORD(2,2), &this->dll);
+    #endif
 	this->Evs = evs;
 	this->Evs->addEvent(new Event(3,funcao,NULL));
 	memset(&this->InformacoesConection, 0x0, sizeof(this->InformacoesConection));
@@ -11,8 +18,7 @@ EasySocket::EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events
 		std::cout << "Erro ao Criar Socket" << std::endl;
 }
 
-int EasySocket::bffSiz = 1024;
-int EasySocket::conectar(){
+int EasySocket::Connect(){
 	if (connect(this->conection, (struct sockaddr*)&this->InformacoesConection, sizeof(this->InformacoesConection)) < 0){
 		std::cout << "Erro De Conexao Verifique IP/Porta" << std::endl;
 		this->closed=true;
@@ -27,44 +33,75 @@ int EasySocket::conectar(){
 	return 1;
 }
 
-int EasySocket::Enviar(std::string msg){
-	if ((send(this->conection, msg.c_str(), msg.length(), 0)) < 0){
-		std::cout << "Erro ao enviar"<< std::endl;
-		return 0;
-	}
-	return 1;
-}
 #ifdef _WIN32
 	void EasySocket::ReceiverDefault(void *arg){
 #elif __linux__
 	void* EasySocket::ReceiverDefault(void *arg){
 #endif
 	EasySocket *sk = (EasySocket*)arg;
-	char buffer[1024];
+	char buffer[sk->Buffersize];
 	memset(buffer, 0x0, sizeof(buffer));
 	while (recv(sk->conection, buffer, sizeof(buffer), 0)>0)
 	{
+		char *x=(char*)malloc(sizeof(buffer));
+		strcpy(x,buffer);
+		sk->EntradasVector.push_back(x);
 		string nm(buffer);
 		sk->Entradas.push_back(nm);
 		memset(buffer, 0x0, sizeof(buffer));
+		sk->Evs->getEvent(3)->parametros=sk;
 		sk->Evs->sendSignal(3);
 	}
-	std::cout << "Desconectado" << std::endl;
 	closesocket(sk->conection);
 	sk->closed=true;
+#ifdef _WIN32
+	return;
+#elif __linux__
+	return NULL;
+#endif
 }
 
-string EasySocket::getEntrada(){
+sockaddr_in* EasySocket::getSockAddr(){
+	return &this->InformacoesConection;
+}
+
+string EasySocket::getInput(){
 	string temp = this->Entradas.front();
 	this->Entradas.pop_front();
+	free(this->EntradasVector.front());
+	this->EntradasVector.pop_front();
 	return temp;
 }
 
-int EasySocket::qtEntradas(){
-	return this->Entradas.size();
+char* EasySocket::getInputVector(){
+	if(this->EntradasVector.empty())
+		return this->vazio;
+	char *atual = this->EntradasVector.front();
+	this->EntradasVector.pop_front();
+	this->Entradas.pop_front();
+	return atual;
 }
 
-void EasySocket::Desconectar(){
+list<string>* EasySocket::getInputs(){
+	return &this->Entradas;
+}
+
+int EasySocket::SendMsg(std::string msg){
+	if ((send(this->conection, msg.c_str(), msg.length(), 0)) < 0){
+		std::cout << "Erro ao enviar"<< std::endl;
+		return 0;
+	}
+	return 1;
+}
+int EasySocket::SendMsg(char msg[]){
+	if ((send(this->conection, msg, strlen(msg), 0)) < 0){
+		std::cout << "Erro ao enviar"<< std::endl;
+		return 0;
+	}
+	return 1;
+}
+
+void EasySocket::Disconnect(){
 	closesocket(this->conection);
 }
 
@@ -72,7 +109,6 @@ bool EasySocket::isClosed(){
 	return this->closed;
 }
 
-EasySocket::~EasySocket()
-{
+EasySocket::~EasySocket(){
 	
 }

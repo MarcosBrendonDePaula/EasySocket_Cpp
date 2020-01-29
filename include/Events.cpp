@@ -39,7 +39,8 @@
                 goto lim;
             }
             This->rodando=true;
-            This->Leventos[This->LEDP.front()]->funcao(This->Leventos[This->LEDP.front()]->parametros);
+            Event *Atual = This->Leventos[This->LEDP.front()];
+            Atual->funcao(Atual->parametros);
             This->LEDP.pop_front();
         }
     }
@@ -97,11 +98,12 @@
                 goto lim;
             }
             This->rodando=true;
+            Event *Atual = This->Leventos[This->LEDP.front()];
             //single process
             if(!This->Paralel)
-                This->Leventos[This->LEDP.front()]->funcao(This->Leventos[This->LEDP.front()]->parametros);
+                Atual->funcao(Atual->parametros);
             else
-                _beginthread(This->Leventos[This->LEDP.front()]->funcao,0,This->Leventos[This->LEDP.front()]->parametros);
+                _beginthread(Atual->funcao,0,Atual->parametros);
             This->LEDP.pop_front();
         }
     }

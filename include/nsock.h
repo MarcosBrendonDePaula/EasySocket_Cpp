@@ -27,12 +27,15 @@ class Nsock{
 		struct sockaddr_in DadosCliente;
 		list<string> Entrada;
 		list<int> *ordem;
+		list<char*> EntradaVetorizada;
 		//vector<Nsock*> *conexoes;
 		map<int,Nsock*> *connections;
 		Events *Evs;
+		char vazio[6];
 		int erro;
 	public:
 		int id;
+		int BufferSize;
 		Nsock(list<int> *lista,map<int,Nsock*> *cn,Events *Evs);
 		#ifdef _WIN32
 			static void ReceiveFunction(void *arg);
@@ -45,5 +48,7 @@ class Nsock{
 		int start();
 		void Close();
 		string getInput();
+		char* getInputVector();
 		int SendMsg(string msg);
+		int SendMsg(char msg[],int size);
 };

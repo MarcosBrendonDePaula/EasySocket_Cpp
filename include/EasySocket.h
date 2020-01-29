@@ -21,11 +21,15 @@ private:
 	SOCKET conection;
 	sockaddr_in InformacoesConection;
 	list<string> Entradas;
+	list<char*> EntradasVector;
 	Events *Evs;
+	char vazio[6];
 	bool closed;
 public:
-	static int bffSiz;
+	int Buffersize;
+
 	#ifdef _WIN32
+		WSADATA dll;
 		static void ReceiverDefault(void *arg);
 	#elif __linux__
 		pthread_t ThreadCliente;
@@ -33,11 +37,17 @@ public:
 	#endif
 	
 	EasySocket(std::string ip, int porta,void(*funcao)(void *arg),Events *evs);
-	string getEntrada();
-	int qtEntradas();
-	int conectar();
-	int Enviar(std::string msg);
+	string getInput();
+	char* getInputVector();
+	
+	sockaddr_in* getSockAddr();
+	list<string>* getInputs();
+	int Connect();
+	
+	int SendMsg(std::string msg);
+	int SendMsg(char msg[]);
+
 	bool isClosed();
-	void Desconectar();
+	void Disconnect();
 	~EasySocket();
 };

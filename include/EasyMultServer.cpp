@@ -48,8 +48,7 @@ list<int> EasyMultServer::inputOrders;
 			socklen_t tam=sizeof(*DadosCliente);
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
 			if((*cliente>0)*(This->limit>This->Connections.size())*This->opened){
-				cout<<"Conexao Aceita"<<endl;
-				if(This->Evs->getEvent(2)){
+				if(This->Evs->getEvent(2)!=NULL){
 					This->Evs->getEvent(2)->parametros = atual;
 					This->Evs->sendSignal(2);
 				}

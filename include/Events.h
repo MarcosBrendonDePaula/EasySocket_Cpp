@@ -6,8 +6,9 @@
     #include <list>
     #include <unistd.h>
     #include <stdio.h>
-    class Event{
-    public:
+    class Event
+    {
+        public:
             Event(int ID,void(*funcao)(void*),void *parametro);
             Event(int ID,void(*funcao)(void*));
             Event(int ID,void(*funcao)());
@@ -15,21 +16,23 @@
             void *parametros;
             void(*funcao)(void*);
     };
-    class Events{
-    public:
-        static void* ExecutorF(void* arg);
-        static Events *static_Acess;
-        Events();
-        void addEvent(Event *E);
-        void sendSignal(int ID);
-        Event* getEvent(int id);
-        bool Paralel;
-    private:
-        bool Debug;
-        pthread_t executor;
-        std::list<int> LEDP;
-        std::map<int,Event*> Leventos;
-        bool rodando;
+    
+    class Events
+    {
+        public:
+            static void* ExecutorF(void* arg);
+            static Events *static_Acess;
+            Events();
+            void addEvent(Event *E);
+            void sendSignal(int ID);
+            Event* getEvent(int id);
+            bool Paralel;
+        private:
+            bool Debug;
+            pthread_t executor;
+            std::list<int> LEDP;
+            std::map<int,Event*> Leventos;
+            bool rodando;
     };
 #elif _WIN32
     #include <iostream>
@@ -39,7 +42,8 @@
     #include <windows.h>
     #include <unistd.h>
     #include <stdio.h>
-    class Event{
+    class Event
+    {
         public:
             Event(int ID,void(*funcao)(void*),void *parametro);
             Event(int ID,void(*funcao)(void*));
@@ -48,7 +52,8 @@
             void *parametros;
             void(*funcao)(void*);
     };
-    class Events{
+    class Events
+    {
         public:
             static void ExecutorF(void* arg);
             static void KeyMonitor(void* arg);
