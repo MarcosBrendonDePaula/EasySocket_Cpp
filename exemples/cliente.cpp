@@ -1,7 +1,7 @@
 #include "../include/EasySocket.h"
 #include "../include/Events.h"
 using namespace std;
-void recepcao(void *arg)
+void RecEvent(void *arg)
 {
     EasySocket *SK=(EasySocket*)arg;
     cout<<SK->getInput()<<endl;
@@ -9,21 +9,29 @@ void recepcao(void *arg)
 
 int main()
 {
+    //The management class for the current instance
     Events Eventos;
+    
     string ip;
     int porta;
-    cout<<"Informe o IP"<<endl;
+    
+    cout<<"type the IP address"<<endl;
     cin>>ip;
-    cout<<"Informa A porta"<<endl;
+    cout<<"type the port"<<endl;
     cin>>porta;
-    EasySocket Conexao(ip,porta,&recepcao,&Eventos);
+    
+    EasySocket Conexao(ip,porta,&RecEvent,&Eventos);
+    string msg;
     if(Conexao.Connect())
     {
         while(!Conexao.isClosed())
         {
-            cin>>ip;
-            Conexao.SendMsg(ip);
+            cin>>msg;
+            Conexao.SendMsg(msg);
         }
+    }else
+    {
+        cout<<"Error"<<endl;
     }
     return 0;
 }

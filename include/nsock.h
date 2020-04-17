@@ -4,6 +4,7 @@
 	#include <process.h>
 #elif __linux__
 	#include<netinet/in.h>
+	#include <arpa/inet.h>
 	#include<pthread.h>
 	#include<unistd.h>
 #endif
@@ -51,4 +52,6 @@ class Nsock{
 		char* getInputVector();
 		int SendMsg(string msg);
 		int SendMsg(char msg[],int size);
+		const string getIP();
+		const int getPort();
 };

@@ -1,7 +1,7 @@
 #include "../include/EasyMultServer.h"
 #include "../include/Events.h"
 using namespace std;
-
+Events Eventos;
 void process(void* arg){
     Nsock *Socketc = (Nsock*)arg;
     char *input = Socketc->getInputVector();
@@ -10,7 +10,7 @@ void process(void* arg){
 }   
 
 void connection(void* arg){
-    Nsock *Socketc = (Nsock*)arg;
+    const Nsock *Socketc = (Nsock*)arg;
 }
 
 void dconnection(void* arg){
@@ -18,8 +18,7 @@ void dconnection(void* arg){
 }
 
 int main(){
-    Events Eventos;
-    Eventos.Paralel = true;
+    Eventos.Paralel = false;
     EasyMultServer servidor(25565,&Eventos);
     servidor.Start(&process,900,&connection,&dconnection);
     while(true){

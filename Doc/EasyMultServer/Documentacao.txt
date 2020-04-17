@@ -1,0 +1,5 @@
+EasyMultServer:
+    Metodo Construtor :
+        EasyMultServer(Porta,Events):
+            Porta : int -> Porta ao qual o servidor será aberta
+            Events : Events* -> Classe do tipo Events necessario para disparar os eventos

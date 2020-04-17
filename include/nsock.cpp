@@ -44,14 +44,19 @@ Nsock::Nsock(list<int> *lista,map<int,Nsock*> *cn,Events *Evs)
 	this->connections=cn;
 	memset(&this->DadosCliente,0x0,sizeof(this->DadosCliente));
 }
+
+
 SOCKET* Nsock::getClient()
 {
 	return &this->cliente;
 }
+
+
 struct sockaddr_in* Nsock::getSocketInfo()
 {
 	return &this->DadosCliente;
 }
+
 int Nsock::start()
 {
 	#ifdef _WIN32
@@ -61,6 +66,20 @@ int Nsock::start()
 	#endif
 	return 1;
 }
+
+
+const string Nsock::getIP()
+{
+	string ip(inet_ntoa(this->DadosCliente.sin_addr));
+	return ip;
+}
+
+
+const int Nsock::getPort()
+{
+	return ((int) ntohs(this->DadosCliente.sin_port));
+}
+
 
 string Nsock::getInput()
 {
@@ -74,6 +93,8 @@ string Nsock::getInput()
 	this->EntradaVetorizada.pop_front();
 	return entrada;
 }
+
+
 char* Nsock::getInputVector()
 {
 	if(this->EntradaVetorizada.empty()){
@@ -84,6 +105,7 @@ char* Nsock::getInputVector()
 	this->Entrada.pop_front();
 	return atual;
 }
+
 
 int Nsock::SendMsg(string msg)
 {
@@ -97,6 +119,8 @@ int Nsock::SendMsg(string msg)
 	}
 	return 1;
 }
+
+
 int Nsock::SendMsg(char msg[],int size){
 	int status=send(this->cliente,msg,size,0);
 	if(status<0){
@@ -108,6 +132,7 @@ int Nsock::SendMsg(char msg[],int size){
 	}
 	return 1;
 }
+
 
 void Nsock::Close(){
 	closesocket(this->cliente);
