@@ -28,7 +28,6 @@ class Nsock{
 		struct sockaddr_in DadosCliente;
 		list<string> Entrada;
 		list<int> *ordem;
-		list<char*> EntradaVetorizada;
 		//vector<Nsock*> *conexoes;
 		map<int,Nsock*> *connections;
 		Events *Evs;
@@ -49,9 +48,21 @@ class Nsock{
 		int start();
 		void Close();
 		string getInput();
-		char* getInputVector();
 		int SendMsg(string msg);
-		int SendMsg(char msg[],int size);
 		const string getIP();
 		const int getPort();
+
+		template<typename __type> bool sendVar(__type var){
+			char *temp = (char*)&var;
+			if(send(this->cliente,temp,sizeof(__type),0)>=0){
+				return true;
+			}
+			return false;
+		}
+
+		template<typename __type> bool ReciveVar(__type* rec){
+			__type *temp=rec;
+			if(recv(this->cliente,(char*)temp,sizeof(__type),0)>0){return true;};
+			return false;
+		}
 };

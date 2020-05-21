@@ -93,13 +93,6 @@ int EasySocket::SendMsg(std::string msg){
 	}
 	return 1;
 }
-int EasySocket::SendMsg(char msg[]){
-	if ((send(this->conection, msg, strlen(msg), 0)) < 0){
-		std::cout << "Erro ao enviar"<< std::endl;
-		return 0;
-	}
-	return 1;
-}
 
 void EasySocket::Disconnect(){
 	closesocket(this->conection);
@@ -107,6 +100,10 @@ void EasySocket::Disconnect(){
 
 bool EasySocket::isClosed(){
 	return this->closed;
+}
+
+SOCKET EasySocket::getSocket(){
+	return this->conection;
 }
 
 EasySocket::~EasySocket(){

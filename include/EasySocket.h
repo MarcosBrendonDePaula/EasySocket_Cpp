@@ -45,9 +45,24 @@ public:
 	int Connect();
 	
 	int SendMsg(std::string msg);
-	int SendMsg(char msg[]);
+
+	SOCKET getSocket();
 
 	bool isClosed();
 	void Disconnect();
+	
+	template<typename __type> bool sendVar(__type var){
+		char *temp = (char*)&var;
+		if(send(this->conection,temp,sizeof(__type),0)>=0){
+			return true;
+		}
+		return false;
+	}
+
+	template<typename __type> bool ReciveVar(__type* rec){
+		__type *temp=rec;
+		if(recv(this->conection,(char*)temp,sizeof(__type),0)>0){return true;};
+		return false;
+	}
 	~EasySocket();
 };
