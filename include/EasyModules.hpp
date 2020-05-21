@@ -2,7 +2,7 @@
 #include "EasySocket.h"
 #include <fstream>
 namespace EasyModule{
-    void getFile(int socket,string out){
+    void ReciveFile(int socket,string out){
         ofstream file(out,ios::out | ios::binary);
         int size;
         do{
