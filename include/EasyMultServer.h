@@ -1,6 +1,6 @@
 #pragma once
 #ifdef _WIN32
-	#include <wiNsock2.h>
+	#include <winsock2.h>
 #elif __linux__
 	#include<netinet/in.h>
 	#include<pthread.h>

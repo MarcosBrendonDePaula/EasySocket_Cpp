@@ -1,5 +1,4 @@
 #include "EasyMultServer.h"
-
 list<int> EasyMultServer::inputOrders;
 #ifdef _WIN32
 	void EasyMultServer::Recebimento(void *arg){
@@ -16,7 +15,6 @@ list<int> EasyMultServer::inputOrders;
 			int tam=sizeof(*DadosCliente);
 			*cliente=accept(This->ServeSock,(struct sockaddr*)DadosCliente,&tam);
 			if((*cliente>0)*(This->limit>This->Connections.size())*This->opened){
-				cout<<"Conexao Aceita"<<endl;
 				if(This->Evs->getEvent(2)){
 					This->Evs->getEvent(2)->parametros = atual;
 					This->Evs->sendSignal(2);

@@ -51,18 +51,4 @@ class Nsock{
 		int SendMsg(string msg);
 		const string getIP();
 		const int getPort();
-
-		template<typename __type> bool sendVar(__type var){
-			char *temp = (char*)&var;
-			if(send(this->cliente,temp,sizeof(__type),0)>=0){
-				return true;
-			}
-			return false;
-		}
-
-		template<typename __type> bool ReciveVar(__type* rec){
-			__type *temp=rec;
-			if(recv(this->cliente,(char*)temp,sizeof(__type),0)>0){return true;};
-			return false;
-		}
 };
