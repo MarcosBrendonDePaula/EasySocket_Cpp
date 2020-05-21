@@ -7,7 +7,7 @@ void Request(void *arg){
     Nsock *sock = ((Nsock*)arg);
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
-        EasyModule::ReciveFile(*sock->getClient(),"received.cpp");
+        EasyModule::reciveFile(*sock->getClient(),"received.cpp");
         cout<<"ok"<<endl;
     }
 }

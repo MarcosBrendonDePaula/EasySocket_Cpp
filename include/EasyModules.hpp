@@ -2,7 +2,7 @@
 #include "EasySocket.h"
 #include <fstream>
 namespace EasyModule{
-    void ReciveFile(int socket,string out){
+    void reciveFile(int socket,string out){
         ofstream file(out,ios::out | ios::binary);
         int size;
         do{
@@ -15,11 +15,10 @@ namespace EasyModule{
         file.close();
     }
 
-    void sendFile(int socket,string in,int dlay){
+    void sendFile(int socket,string in){
         ifstream file(in,ios::binary|ios::in|ios::ate);
         int size = file.tellg();
         file.seekg (0, ios::beg);
-        sleep(dlay);
         if(size>=1499){
             char buff[1499]={};
             file.read(buff,1499);
