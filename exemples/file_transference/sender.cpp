@@ -11,11 +11,13 @@ void response(void *arg){
 
 int main(){
     Events Ev;
-    EasySocket socket("127.0.0.1",25565,&response,&Ev);
+    EasySocket socket("192.168.1.118",25565,&response,&Ev);
     socket.Connect();
     socket.SendMsg("RecvArq");
-    sleep(2);
+    sleep(1);
+    cout<<"Enviando"<<endl;
     EasyModule::sendFile(socket.getSocket(),"musica.mp3");
+    cout<<"Enviado!"<<endl;
     int x;
     cin>>x;
     return 0;
