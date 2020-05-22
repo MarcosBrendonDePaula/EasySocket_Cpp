@@ -8,6 +8,7 @@ namespace EasyModule{
         do{
             char buff[1499]={};
             size = recv(socket,buff,1499,0);
+            send(socket,to_string(size).c_str(),to_string(size).length(),0);
             if(strcmp(buff,"{-endf-}")==0)
                 break;
             file.write(buff,size);
@@ -24,6 +25,8 @@ namespace EasyModule{
             file.read(buff,1499);
             do{
                 send(socket,buff,1499,0);
+                recv(socket,buff,1499,0);
+                cout<<buff<<endl;
             }while(file.read(buff,1499));
         }else{
             char buff[size]={};

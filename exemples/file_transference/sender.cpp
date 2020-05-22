@@ -14,8 +14,8 @@ int main(){
     EasySocket socket("127.0.0.1",25565,&response,&Ev);
     socket.Connect();
     socket.SendMsg("RecvArq");
-    sleep(1);
-    EasyModule::sendFile(socket.getSocket(),"sender.cpp");
+    sleep(2);
+    EasyModule::sendFile(socket.getSocket(),"musica.mp3");
     int x;
     cin>>x;
     return 0;

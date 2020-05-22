@@ -3,11 +3,6 @@
 #include "../../include/Events.h"
 #include <sstream>
 #include <fstream>
-class stats{
-    public:
-        int prepared;
-        
-};
 void Request(void *arg){
     Nsock *sock = ((Nsock*)arg);
     string msg = sock->getInput();
