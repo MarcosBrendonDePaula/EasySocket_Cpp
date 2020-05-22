@@ -11,7 +11,7 @@ void response(void *arg){
 
 int main(){
     Events Ev;
-    EasySocket socket("192.168.1.118",25565,&response,&Ev);
+    EasySocket socket("127.0.0.1",25565,&response,&Ev);
     socket.Connect();
     socket.SendMsg("RecvArq");
     sleep(1);
