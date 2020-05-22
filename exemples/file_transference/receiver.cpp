@@ -3,10 +3,16 @@
 #include "../../include/Events.h"
 #include <sstream>
 #include <fstream>
+class stats{
+    public:
+        int prepared;
+        
+};
 void Request(void *arg){
     Nsock *sock = ((Nsock*)arg);
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
+
         EasyModule::reciveFile(*sock->getClient(),"received.cpp");
         cout<<"ok"<<endl;
     }

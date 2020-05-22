@@ -1,0 +1,1 @@
+g++ .\receiver.cpp ..\..\include\*.cpp -o receiver -l ws2_32

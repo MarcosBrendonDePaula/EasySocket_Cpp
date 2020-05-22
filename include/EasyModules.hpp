@@ -33,30 +33,29 @@ namespace EasyModule{
         char buffF[]="{-endf-}";
         send(socket,buffF,8,0);
     }
-
+    //-------------------------------------------------------------------Nsock
     template<typename __type> bool sendVar(Nsock* socket,__type var){
 			char *temp = (char*)&var;
-			if(send(socket->getClient(),temp,sizeof(__type),0)>=0){
-				return true;
-			}
+			if(send(socket->getClient(),temp,sizeof(__type),0)>=0){return true;}
 			return false;
 	}
 
-    template<typename __type> bool ReciveVar(Nsock* socket,__type* rec){
+    template<typename __type> __type* ReciveVar(Nsock* socket,__type* rec){
         __type *temp=rec;
         if(recv(socket->getClient(),(char*)temp,sizeof(__type),0)>0){return true;};
-        return false;
+        return temp;
     }
 
+    //-------------------------------------------------------------------EasySocket
     template<typename __type> bool sendVar(EasySocket* socket,__type var){
-			char *temp = (char*)&var;
-			if(send(socket->getSocket(),temp,sizeof(__type),0)>=0){return true;}
-			return false;
+        char *temp = (char*)&var;
+        if(send(socket->getSocket(),temp,sizeof(__type),0)>=0){return true;}
+        return false;
 	}
 
-    template<typename __type> bool ReciveVar(EasySocket*  socket,__type* rec){
+    template<typename __type> __type* ReciveVar(EasySocket*  socket,__type* rec){
         __type *temp=rec;
         if(recv(socket->getSocket(),(char*)temp,sizeof(__type),0)>0){return true;};
-        return false;
+        return temp;
     }
 }
