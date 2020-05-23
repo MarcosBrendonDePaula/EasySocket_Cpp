@@ -1,14 +1,19 @@
 #include "EasyMultServer.h"
 #include "EasySocket.h"
 #include <fstream>
+#include <vector>
+#include <fstream>
+#include <sstream>
+
 namespace EasyModule{
+	
     void reciveFile(int socket,string out){
         ofstream file(out,ios::out | ios::binary);
         int size;
-        char ack[]="ok";
         do{
-            char buff[1499]={};
+            char buff[1499]={},ack[2]={'o','k'};
             size = recv(socket,buff,1499,0);
+            send(socket,ack,2,0);
             if(strcmp(buff,"{-endf-}")==0)
                 break;
             file.write(buff,size);
@@ -20,12 +25,12 @@ namespace EasyModule{
         ifstream file(in,ios::binary|ios::in|ios::ate);
         int size = file.tellg();
         file.seekg (0, ios::beg);
-        char ack[2]={};
         if(size>=1499){
-            char buff[1499]={};
+            char buff[1499]={},ack[2]={};
             file.read(buff,1499);
             do{
                 send(socket,buff,1499,0);
+                recv(socket,ack,2,0);
             }while(file.read(buff,1499));
         }else{
             char buff[size]={};
@@ -60,4 +65,10 @@ namespace EasyModule{
         if(recv(socket->getSocket(),(char*)temp,sizeof(__type),0)>0){return true;};
         return temp;
     }
+
+	vector<string> split(string str,char delimiter){
+		stringstream ss(str);string token;vector<string> keys;
+		while (getline(ss, token, delimiter)){keys.push_back(token);}
+		return keys;
+	}
 }

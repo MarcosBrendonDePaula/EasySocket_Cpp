@@ -7,9 +7,11 @@ void Request(void *arg){
     Nsock *sock = ((Nsock*)arg);
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
+        sock->SendMsg("getmusica.mp3");
         EasyModule::reciveFile(*sock->getClient(),"musica1.mp3");
         cout<<"ok"<<endl;
     }
+
 }
 
 int main(){
