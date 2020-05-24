@@ -43,14 +43,14 @@ namespace EasyModule{
     //-------------------------------------------------------------------Nsock
     template<typename __type> bool sendVar(Nsock* socket,__type var){
 			char *temp = (char*)&var;
-			if(send(socket->getClient(),temp,sizeof(__type),0)>=0){return true;}
+			if(send(*(socket->getClient()),temp,sizeof(__type),0)>=0){return true;}
 			return false;
 	}
 
     template<typename __type> __type* ReciveVar(Nsock* socket,__type* rec){
         __type *temp=rec;
-        if(recv(socket->getClient(),(char*)temp,sizeof(__type),0)>0){return true;};
-        return temp;
+        if(recv(*(socket->getClient()),(char*)temp,sizeof(__type),0)>0){return temp;};
+        return NULL;
     }
 
     //-------------------------------------------------------------------EasySocket
@@ -62,8 +62,8 @@ namespace EasyModule{
 
     template<typename __type> __type* ReciveVar(EasySocket*  socket,__type* rec){
         __type *temp=rec;
-        if(recv(socket->getSocket(),(char*)temp,sizeof(__type),0)>0){return true;};
-        return temp;
+        if(recv(socket->getSocket(),(char*)temp,sizeof(__type),0)>0){return temp;};
+        return NULL;
     }
 
 	vector<string> split(string str,char delimiter){
