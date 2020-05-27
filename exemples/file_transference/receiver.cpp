@@ -8,7 +8,7 @@ void Request(void *arg){
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
         sock->SendMsg("getmusica.mp3");
-        EasyModule::reciveFile(*sock->getClient(),"musica1.mp3");
+        EasyModule::recivePreFile(*sock->getClient(),"arq.rec",true);
         cout<<"ok"<<endl;
     }
 

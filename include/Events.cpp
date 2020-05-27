@@ -31,6 +31,7 @@ void Events::sendSignal(int ID){
 }
 
 #ifdef __linux__
+//function with call event in linux
 void* Events::callFunction(void* arg)
 {
     Event *eventoAtual = (Event*)arg;
@@ -81,6 +82,7 @@ void Events::ExecutorF(void* arg)
 }
 
 #ifdef _WIN32
+//trigger event for the Key monitor (windowsApi)
 void Events::KeyMonitor(void* arg){
     Events *This=(Events*)arg;
     while (true) {						
@@ -95,8 +97,7 @@ void Events::KeyMonitor(void* arg){
         }
     }
 }
-
-
+//Key monitor with windows api
 void Events::OnKeyMonitor(void(*funcao)(void*)){
     if(!this->KeySMonitor){
         this->addEvent(new Event(159753,funcao));
@@ -105,17 +106,30 @@ void Events::OnKeyMonitor(void(*funcao)(void*)){
 }
 #endif
 
+//event catcher
+/*
+    param id type int event selector whose id is the same
+*/
 Event* Events::getEvent(int id){
     return this->Leventos[id];
 }
+
+//constructor Event
 /*
-    Construtor Evento
+    param ID id type int to select the event
+    param funcao type void(void*) function to be performed
+    param parametro type undefined parameter to be sent to the function previously informed
 */
 Event::Event(int ID,void(*funcao)(void*),void *parametro){
     this->funcao=funcao;
     this->ID=ID;
     this->parametros=parametro;
 }
+//constructor Event with function parameters null
+/*
+    param ID id type int to select the event
+    param funcao type void(void*) function to be performed
+*/
 Event::Event(int ID,void(*funcao)(void*)){
     this->funcao=funcao;
     this->ID=ID;
