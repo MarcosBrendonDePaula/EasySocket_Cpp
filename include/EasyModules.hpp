@@ -7,144 +7,104 @@
 #include <cmath>
 
 namespace EasyModule{
-	
-    void reciveFile(int socket,string out,bool monitor){
-        ofstream file(out,ios::out | ios::binary);
-        double size,sizeF,sizeA=0;
-        char sizebf[1499]={};
-        recv(socket,sizebf,1499,0);
-        sizeF = atoi(sizebf);
-        do{
-            char buff[1499]={},ack[2]={'o','k'};
-            size = recv(socket,buff,1499,0);
+	typedef unsigned long long int ulli;
+    class File{
+        public:
+            vector<char*> Binary;
+            ulli FileSize;
+            int Mod;
+            bool FileOpen(string filename){
+                ifstream file(filename,ios::binary|ios::in|ios::ate);
+                if(!file.is_open()){
+                    return false;
+                }
+                this->FileSize = file.tellg();
+                file.seekg (0, ios::beg);
+                this->Mod = (this->FileSize%1499);
+                
+                for(ulli i=0;i<=(this->FileSize-this->Mod);i+=1499){
+                    char *temp = new char[1499];
+                    temp[1499] = {};
+                    file.read(temp,1499);
+                    Binary.push_back(temp);
+                }
+
+                if(this->Mod){
+                    char *temp=new char[Mod];
+                    temp[Mod]={};
+                    file.read(temp,Mod);
+                    Binary.push_back(temp);
+                }
+                file.close();
+                return true;
+            }
+
+            void ClearMem(){
+                for(auto i:this->Binary){
+                    free(i);
+                }
+            }
+            bool FileSave(const string local){
+                if(local.empty()||Binary.empty())
+                    return false;
+                ofstream file(local,ios::out | ios::binary);
+                for(int i=0;i<(Binary.size()-1);i++){
+                    file.write(Binary[i],1499);
+                }
+                file.write(Binary.back(),Mod);
+                file.close();
+                return true;
+            }
+    };
+
+    File recivePreFile(int socket,string out,bool monitor){
+        char ack[2]={'o','k'}; //miniAck
+        char FileSBf[1499]={};
+        recv(socket,FileSBf,1499,0);
+
+        File temp;
+        temp.FileSize = atoi(FileSBf);
+        temp.Mod = (temp.FileSize%1499);
+
+        for(int i=0;i<=temp.FileSize;){
+            char MaxBuffer[1499]={};
+
+            int SizeR = recv(socket,MaxBuffer,1499,0);
+            if(SizeR==-1){
+                cout<<SizeR<<endl;
+                temp.Binary.clear();
+                return temp;
+            }
             send(socket,ack,2,0);
-            if(strcmp(buff,"{-endf-}")==0)
-                break;
-            file.write(buff,size);
-            sizeA=sizeA+size;
-            if(monitor)
-                cout<<(sizeF/1000000)<<" -> "<<(sizeA/1000000)<<endl;
-        }while(size==1499);
-        file.close();
-    }
 
-    void sendFile(int socket,string in,bool monitor){
-        ifstream file(in,ios::binary|ios::in|ios::ate);
-        int size = file.tellg();
-        double sizeA = 0,sizeF=size;
-        file.seekg (0, ios::beg);
+            char *tempc = new char[SizeR];
+            memcpy(tempc,MaxBuffer,SizeR);
+            temp.Binary.push_back(tempc);
 
-        send(socket,to_string(size).c_str(),to_string(size).length(),0);
-        if(size>=1499){
-            char buff[1499]={},ack[2]={};
-            file.read(buff,1499);
-            do{
-                send(socket,buff,1499,0);
-                recv(socket,ack,2,0);
-                sizeA+=1499;
-                if(monitor)
-                    cout<<(sizeF/1000000)<<" -> "<<(sizeA/1000000)<<endl;
-            }while(file.read(buff,1499));
-        }else{
-            char buff[size]={};
-            file.read(buff,size);
-            send(socket,buff,size,0);
-        }
-        char buffF[]="{-endf-}";
-        send(socket,buffF,8,0);
-    }
-    
-    void recivePreFile(int socket,string out,bool monitor){
-        double size,sizeA=0;
-        char sizebf[1499]={};
-        unsigned long long int sizeF;
-        recv(socket,sizebf,1499,0);
-        
-        sizeF = atoi(sizebf);
-
-        int resto = (((int)sizeF)%1499);
-
-        vector<char*> Binarios;
-        cout<<"Rec >"<<((sizeF/1499)-(resto>0))<<endl;
-        for(int i=0;i<((sizeF/1499)-(resto>0));i++){
-            char *buff=new char[1499],ack[2]={'o','k'};
-            buff[1499]={};
-            recv(socket,buff,1499,0);
-            send(socket,ack,2,0);
-            Binarios.push_back(buff);
+            i+=SizeR;
             if(monitor){
-                cout<<(i*1499)<<":<->:"<<sizeF<<endl;
+                cout<<(i/1000000)<<"Mb <->"<<(temp.FileSize/1000000)<<"Mb"<<endl;
             }
         }
-        if(resto){
-            char *buff=new char[resto];
-            size = recv(socket,buff,resto,0);
-            Binarios.push_back(buff);
-            if(monitor){
-                cout<<resto+(Binarios.size()*1499)<<":<->:"<<sizeF<<endl;
-            }
-        }
-
-        /*do{
-            char *buff=new char[1499],ack[2]={'o','k'};
-            buff[1499]={};
-            size = recv(socket,buff,1499,0);
-            send(socket,ack,2,0);
-            if(sizeA>=sizeF)
-                break;
-            Binarios.push_back(buff);
-            sizeA=sizeA+size;
-            if(monitor)
-                cout<<(sizeF/1000000)<<" -> "<<(sizeA/1000000)<<endl;
-        }while(true);*/
-
-        ofstream file(out,ios::out | ios::binary);
-        for(int i=0;i<Binarios.size()-1;i++){
-            file.write(Binarios[i],1499);
-        }
-        file.write(Binarios[(Binarios.size()-1)],size);
-        file.close();
+        return temp;
     }
 
-    void sendPreFile(int socket,string in,bool monitor){
-        ifstream file(in,ios::binary|ios::in|ios::ate);
-        int size = file.tellg();
-        file.seekg (0, ios::beg);
-        int resto = (size%1499);
-        vector<char*> Binarios;
-        cout<<"Send >"<<((size/1499)-(resto>0))<<endl;
-        for(int i=0;i<((size/1499)-(resto>0));i++){
-            char *temp=new char[1499];
-            temp[1499]={};
-            file.read(temp,1499);
-            Binarios.push_back(temp);
-        }
-        if(resto){
-            char *temp=new char[resto];
-            temp[resto]={};
-            file.read(temp,resto);
-            Binarios.push_back(temp);
-        }
-        file.close();
-        //Enviando
-        double percent=0;
-        send(socket,to_string(size).c_str(),to_string(size).length(),0);
-        for(int x=0;x<(Binarios.size()-(resto>0));x++){
-            char buffer[2]={};
-            send(socket,Binarios[x],1499,0);
+    void sendPreFile(int socket,File& temp,bool monitor){
+        send(socket,to_string(temp.FileSize).c_str(),to_string(temp.FileSize).length(),0);
+        char buffer[2]={};
+        ulli BitAtual=0;
+        for(int i=0;i<(temp.Binary.size()-1);i++){
+            send(socket,temp.Binary[i],1499,0);
             recv(socket,buffer,2,0);
             if(monitor){
-                cout<<(x*1499)<<":<->:"<<size<<endl;
+                cout<<(BitAtual/1000000)<<"Mb <->"<<(temp.FileSize/1000000)<<"Mb"<<endl;
+                BitAtual+=1499;
             }
         }
-
-        if(resto){
-            send(socket,Binarios[Binarios.size()-1],resto,0);
-            if(monitor){
-                cout<<resto+(Binarios.size()*1499)<<":<->:"<<size<<endl;
-            }
-        }
+        send(socket,temp.Binary.back(),temp.Mod,0);
+        recv(socket,buffer,2,0);
     }
+
     //-------------------------------------------------------------------Nsock
     template<typename __type> bool sendVar(Nsock* socket,__type var){
 			char *temp = (char*)&var;

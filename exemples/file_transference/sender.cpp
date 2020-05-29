@@ -7,14 +7,17 @@
 #include <fstream>
 void response(void *arg){
     if(((EasySocket*)arg)->getInput().find("getmusica.mp3")==0){
-        EasyModule::sendPreFile(((EasySocket*)arg)->getSocket(),"Among.rar",true);
+        EasyModule::File arq;
+        arq.FileOpen("enviar.zip");
+        EasyModule::sendPreFile(((EasySocket*)arg)->getSocket(),arq,true);
+        //arq.ClearMem();
         cout<<"Enviado!"<<endl;
     }
 }
 
 int main(){
     Events Ev;
-    EasySocket socket("177.129.123.246",25565,&response,&Ev);
+    EasySocket socket("127.0.0.1",25565,&response,&Ev);
     socket.Connect();
     socket.SendMsg("RecvArq");
     int x;

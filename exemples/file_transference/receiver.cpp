@@ -8,7 +8,10 @@ void Request(void *arg){
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
         sock->SendMsg("getmusica.mp3");
-        EasyModule::recivePreFile(*sock->getClient(),"arq.rec",true);
+        EasyModule::File arq=EasyModule::recivePreFile(*sock->getClient(),"arq.rec",true);
+        string outname = "saida.rar";
+        arq.FileSave(outname);
+        arq.ClearMem();
         cout<<"ok"<<endl;
     }
 
