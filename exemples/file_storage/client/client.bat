@@ -1,0 +1,1 @@
+g++ .\Client.cpp ..\..\..\include\*.cpp -o client -l ws2_32
