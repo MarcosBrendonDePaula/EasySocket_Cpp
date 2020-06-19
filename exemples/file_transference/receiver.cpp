@@ -8,16 +8,22 @@ void Request(void *arg){
     string msg = sock->getInput();
     if(msg.find("RecvArq")==0){
         sock->SendMsg("getmusica.mp3");
-        EasyModule::File arq=EasyModule::recivePreFile(*sock->getClient(),"arq.rec",true);
-        string outname = "saida.rar";
-        arq.FileSave(outname);
-        arq.ClearMem();
+        ofstream *arq = new ofstream("arq.rec",ios::binary|ios::out);
+        if(EasyModule::recvFile(*sock->getClient(),arq)){
+            cout<<"terminou"<<endl;
+        }else
+        {
+            cout<<"Erro ao Receber"<<endl;
+        }
+        arq->close();
         cout<<"ok"<<endl;
     }
 
 }
 
 int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     Events Eventos;
     EasyMultServer servidor(25565,&Eventos);
     servidor.Start(&Request);

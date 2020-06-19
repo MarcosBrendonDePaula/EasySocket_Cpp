@@ -5,19 +5,20 @@
 #include <cstring>
 #include <vector>
 #include <fstream>
+
 void response(void *arg){
     if(((EasySocket*)arg)->getInput().find("getmusica.mp3")==0){
-        EasyModule::File arq;
-        arq.FileOpen("enviar.zip");
-        EasyModule::sendPreFile(((EasySocket*)arg)->getSocket(),arq,true);
-        //arq.ClearMem();
+        ifstream arq("musica.mp3",ios::binary|ios::in);
+        EasyModule::sendFile(((EasySocket*)arg)->getSocket(),arq);
         cout<<"Enviado!"<<endl;
     }
 }
 
 int main(){
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
     Events Ev;
-    EasySocket socket("127.0.0.1",25565,&response,&Ev);
+    EasySocket socket("192.168.1.10",25565,&response,&Ev);
     socket.Connect();
     socket.SendMsg("RecvArq");
     int x;
