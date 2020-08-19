@@ -15,8 +15,6 @@ void response(void *arg){
 }
 
 int main(){
-    ios_base::sync_with_stdio(false);
-    cin.tie(NULL);
     Events Ev;
     EasySocket socket("192.168.1.10",25565,&response,&Ev);
     socket.Connect();
